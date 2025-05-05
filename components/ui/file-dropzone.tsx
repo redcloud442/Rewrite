@@ -28,7 +28,7 @@ export function FileDropzone({ onFileAccepted }: FileDropzoneProps) {
     <div
       {...getRootProps()}
       className={cn(
-        "border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer transition-colors",
+        "border-4 border-dashed rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer transition-colors",
         isDragActive ? "border-primary bg-primary/10" : "border-muted"
       )}
     >

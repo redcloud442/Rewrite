@@ -4,6 +4,7 @@ import {
   ArrowUpRight,
   Link,
   MoreHorizontal,
+  Plus,
   StarOff,
   Trash2,
 } from "lucide-react";
@@ -24,29 +25,21 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-
-export function NavFavorites({
-  favorites,
-}: {
-  favorites: {
-    name: string;
-    url: string;
-    emoji: string;
-  }[];
-}) {
+import { useNotesStore } from "@/store/notesStore";
+export function NavFavorites() {
   const { isMobile } = useSidebar();
+  const { notes } = useNotesStore();
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel>Favorites</SidebarGroupLabel>
       <SidebarMenu>
-        {favorites.map((item) => (
-          <SidebarMenuItem key={item.name}>
+        {notes.map((item) => (
+          <SidebarMenuItem key={item.id}>
             <SidebarMenuButton asChild>
-              <a href={item.url} title={item.name}>
-                <span>{item.emoji}</span>
-                <span>{item.name}</span>
-              </a>
+              <Link href={`/app/editor/${item.id}`}>
+                <span># {item.title}</span>
+              </Link>
             </SidebarMenuButton>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -82,12 +75,31 @@ export function NavFavorites({
             </DropdownMenu>
           </SidebarMenuItem>
         ))}
-        <SidebarMenuItem>
-          <SidebarMenuButton className="text-sidebar-foreground/70">
-            <MoreHorizontal />
-            <span>More</span>
-          </SidebarMenuButton>
-        </SidebarMenuItem>
+        {notes.length === 0 && (
+          <SidebarMenuItem>
+            <SidebarMenuButton className="text-sidebar-foreground/70">
+              <span>Empty notes</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        )}
+
+        {notes.length > 0 ? (
+          <SidebarMenuItem>
+            <SidebarMenuButton className="text-sidebar-foreground/70">
+              <MoreHorizontal />
+
+              <span>More</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        ) : (
+          <SidebarMenuItem>
+            <SidebarMenuButton className="text-sidebar-foreground/70">
+              <Plus />
+
+              <span>Add Note</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        )}
       </SidebarMenu>
     </SidebarGroup>
   );

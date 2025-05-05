@@ -58,3 +58,20 @@ export type responseData = {
   response_user_id: string;
   response_value: string;
 };
+
+export type Note = {
+  id: string;
+  title: string;
+};
+
+export type Recording = {
+  id: string;
+  audioName: string;
+  audioUrl: string | null;
+};
+
+export type File = {
+  id: string;
+  audioName: string;
+  audioUrl: string | null;
+};

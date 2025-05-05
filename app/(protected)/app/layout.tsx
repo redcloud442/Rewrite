@@ -7,7 +7,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { UserButton } from "@clerk/nextjs";
+import { SignedIn, UserButton } from "@clerk/nextjs";
 
 type Props = {
   children: React.ReactNode;
@@ -19,19 +19,22 @@ export default function Page({ children }: Props) {
       <SidebarProvider
         style={
           {
-            "--sidebar-width": "350px",
+            "--sidebar-width": "300px",
           } as React.CSSProperties
         }
       >
         <AppSidebar />
         <SidebarInset>
-          <header className="sticky top-0 flex shrink-0 items-center justify-between gap-2 border-b bg-background p-4">
+          <header className="top-0 flex shrink-0 items-center justify-between gap-2 border-b bg-background p-4">
             <div className="flex items-center gap-2">
               <SidebarTrigger className="-ml-1" />
               <Separator orientation="vertical" className="mr-2 h-4" />
               <DynamicBreadcrumb />
-            </div>
-            <UserButton />
+            </div>  
+
+            <SignedIn>
+              <UserButton />
+            </SignedIn>
           </header>
 
           <section className="relative p-4">{children}</section>

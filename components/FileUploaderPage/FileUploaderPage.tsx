@@ -4,9 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { aiModelService } from "@/services/ai-model/ai-model-service";
+import { ttsService } from "@/services/tts/tts-service";
 import { useFileStore } from "@/store/fileStore";
 import { useIsDoneTypingStore } from "@/store/isDoneTypingStore";
-import { useMessageStore } from "@/store/messageStore";
+import { setAllMessages, useMessageStore } from "@/store/messageStore";
+import { Recording } from "@/types/types";
 import { UploadCloud } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -14,6 +16,7 @@ import { Form, FormControl, FormItem } from "../ui/form";
 import { MessageBubble } from "../ui/message-bubble";
 import { ScrollArea } from "../ui/scroll-area";
 import { Separator } from "../ui/separator";
+import { Skeleton } from "../ui/skeleton";
 import FilePlayPageCard from "./FilePlayPageCard";
 import FileUploaderSection from "./FileUploaderSection";
 
@@ -21,12 +24,20 @@ type FormData = {
   message: string;
 };
 
-const FileUploaderPage = () => {
-  const { files } = useFileStore();
+type Props = {
+  recordings: Recording[];
+};
+const FileUploaderPage = ({ recordings }: Props) => {
+  const { files, setFiles, setInitialFiles } = useFileStore();
   const { messages, setMessages } = useMessageStore();
   const { isDoneTyping } = useIsDoneTypingStore();
 
   const [hasProcessed, setHasProcessed] = useState<boolean>(false);
+  const [selectedRecordingId, setSelectedRecordingId] = useState<string | null>(
+    null
+  );
+  const [generatingPastMessages, setGeneratingPastMessages] =
+    useState<boolean>(false);
 
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
@@ -48,7 +59,10 @@ const FileUploaderPage = () => {
       setMessages(message);
       form.reset();
 
-      const response = await aiModelService.askAI({ message: data.message });
+      const response = await aiModelService.askAI({
+        message: data.message,
+        selectedRecordingId,
+      });
 
       const aiMessage = {
         ai: response.ai,
@@ -63,6 +77,27 @@ const FileUploaderPage = () => {
 
   const handleHasProcessed = () => {
     setHasProcessed(true);
+    setSelectedRecordingId(null);
+  };
+
+  const handleGeneratePastMessages = async (recordingId: string) => {
+    try {
+      if (selectedRecordingId === recordingId) return;
+
+      setGeneratingPastMessages(true);
+      const pastMessages = await ttsService.getPastMessages({
+        take: 15,
+        skip: 1,
+        recordingId,
+      });
+
+      setSelectedRecordingId(recordingId);
+      setAllMessages(pastMessages);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setGeneratingPastMessages(false);
+    }
   };
 
   const scrollToBottom = () => {
@@ -77,6 +112,19 @@ const FileUploaderPage = () => {
     }
   }, [messages]);
 
+  useEffect(() => {
+    if (recordings.length > 0) {
+      setInitialFiles(recordings);
+    }
+  }, []);
+
+  const isProcessing =
+    form.formState.isSubmitting || !hasProcessed || !isDoneTyping;
+
+  const hasSelectedRecording = selectedRecordingId !== null;
+
+  const isDisabled = !hasSelectedRecording ? isProcessing : false;
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
       {/* LEFT SIDE: File uploader */}
@@ -87,7 +135,11 @@ const FileUploaderPage = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <FileUploaderSection onHasProcessed={handleHasProcessed} />
+          <FileUploaderSection
+            onHasProcessed={handleHasProcessed}
+            setFiles={setFiles}
+            selectedRecordingId={selectedRecordingId}
+          />
 
           {files.length > 0 && (
             <>
@@ -106,6 +158,8 @@ const FileUploaderPage = () => {
                     key={idx}
                     audioUrl={file.audioUrl || ""}
                     fileName={file.audioName || ""}
+                    recordingId={file.id}
+                    handleViewPastMessages={handleGeneratePastMessages}
                   />
                 ))}
               </ScrollArea>
@@ -130,13 +184,21 @@ const FileUploaderPage = () => {
           <div className="border-t pt-4 flex flex-col gap-2 flex-1">
             <ScrollArea className="h-[500px]">
               <div className="flex flex-col gap-4">
-                {messages.map((message, idx) => (
-                  <MessageBubble
-                    key={idx}
-                    message={message}
-                    isLatest={idx === messages.length - 1}
-                  />
-                ))}
+                {messages.map((message, idx) =>
+                  generatingPastMessages ? (
+                    <div className="space-y-4" key={idx}>
+                      <Skeleton className="w-full h-10" />
+                      <Skeleton className="w-full max-w-[80%] h-10" />
+                    </div>
+                  ) : (
+                    <MessageBubble
+                      key={idx}
+                      message={message}
+                      isLatest={idx === messages.length - 1}
+                      selectedRecordingId={selectedRecordingId}
+                    />
+                  )
+                )}
                 <div ref={chatContainerRef} />
               </div>
             </ScrollArea>
@@ -155,14 +217,7 @@ const FileUploaderPage = () => {
                       />
                     </FormControl>
                   </FormItem>
-                  <Button
-                    type="submit"
-                    disabled={
-                      form.formState.isSubmitting ||
-                      !hasProcessed ||
-                      !isDoneTyping
-                    }
-                  >
+                  <Button type="submit" disabled={isDisabled}>
                     {form.formState.isSubmitting ? "Sending..." : "Send"}
                   </Button>
                 </form>

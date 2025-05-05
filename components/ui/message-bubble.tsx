@@ -4,12 +4,14 @@ import { useTypingEffect } from "./display-text";
 export const MessageBubble = ({
   message,
   isLatest,
+  selectedRecordingId,
 }: {
   message: { ai: boolean; message: string };
   isLatest: boolean;
+  selectedRecordingId: string | null;
 }) => {
   const { isLoading } = useIsLoadingStore();
-  const typedText = useTypingEffect(message.message, 20);
+  const typedText = useTypingEffect(message.message, 20, selectedRecordingId);
 
   const displayedText =
     message.ai && isLatest && isLoading

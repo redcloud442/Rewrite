@@ -1,8 +1,12 @@
-import { createAxiosServer } from "@/providers/axiosClient";
+import { createAxiosServer } from "@/providers/axiosServerClient";
 import { Form } from "@/types/types";
 
 export const formService = {
-  specificFormPage: async (params: { formId: string; index?: number }) => {
+  specificFormPage: async (params: {
+    formId: string;
+    index?: number;
+    token?: string;
+  }) => {
     const form = await createAxiosServer().get(`/form/${params.formId}`);
 
     if (form.status !== 200) {

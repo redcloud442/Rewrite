@@ -1,9 +1,8 @@
-import { base64ToBlob } from "@/lib/helper";
 import { fileUploadSchema, FileUploadSchema } from "@/lib/schema";
 import { ttsService } from "@/services/tts/tts-service";
-import { useFileStore } from "@/store/fileStore";
 import { useIsLoadingStore } from "@/store/isLoadingStore";
 import { useMessageStore } from "@/store/messageStore";
+import { File } from "@/types/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -20,11 +19,16 @@ import {
 
 type Props = {
   onHasProcessed: () => void;
+  setFiles: (file: File) => void;
+  selectedRecordingId: string | null;
 };
 
-const FileUploaderSection = ({ onHasProcessed }: Props) => {
-  const { setFiles } = useFileStore();
-  const { setMessages } = useMessageStore();
+const FileUploaderSection = ({
+  onHasProcessed,
+  setFiles,
+  selectedRecordingId,
+}: Props) => {
+  const { sendMultipleMessages, setAllMessages } = useMessageStore();
   const { setIsLoading } = useIsLoadingStore();
   const form = useForm<FileUploadSchema>({
     resolver: zodResolver(fileUploadSchema),
@@ -39,28 +43,30 @@ const FileUploaderSection = ({ onHasProcessed }: Props) => {
 
     if (!file) return;
 
-    setMessages({
-      message: "Creating a summary of the document...",
-      ai: false,
-    });
-
     try {
       setIsLoading(true);
-      const response = await ttsService.postTTS({ file, voice, language });
 
-      const audioBlob = base64ToBlob(response.audio, "audio/mpeg");
-      const audioUrl = URL.createObjectURL(audioBlob);
-      const message = response.summary;
-
-      setMessages({
-        message: message.text,
-        ai: message.ai,
+      const { audio, summary } = await ttsService.postTTS({
+        file,
+        voice,
+        language,
       });
 
+      const messages = [
+        { message: "Creating a summary of the document...", ai: false },
+        { message: summary.text, ai: summary.ai },
+      ];
+
+      const updateMessages = selectedRecordingId
+        ? setAllMessages
+        : sendMultipleMessages;
+
+      updateMessages(messages);
+
       setFiles({
-        id: file.name,
-        audioName: file.name,
-        audioUrl,
+        id: audio.id,
+        audioName: audio.audioName,
+        audioUrl: audio.audioUrl,
       });
 
       form.reset();
@@ -68,11 +74,9 @@ const FileUploaderSection = ({ onHasProcessed }: Props) => {
       toast.success("Document processed successfully");
       onHasProcessed();
     } catch (error) {
-      if (error instanceof Error) {
-        toast.error(error.message);
-      } else {
-        toast.error("Failed to process document");
-      }
+      const message =
+        error instanceof Error ? error.message : "Failed to process document";
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }
@@ -111,7 +115,7 @@ const FileUploaderSection = ({ onHasProcessed }: Props) => {
         <Button
           type="submit"
           className="mt-4 w-full"
-          disabled={!form.getValues("file") || form.formState.isSubmitting}
+          disabled={!form.watch("file") || form.formState.isSubmitting}
         >
           {form.formState.isSubmitting ? "Processing..." : "Process Document"}
         </Button>

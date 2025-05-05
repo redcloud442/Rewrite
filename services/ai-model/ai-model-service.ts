@@ -1,12 +1,12 @@
 import { createAxiosClient } from "@/providers/axiosClient";
 
 export const aiModelService = {
-  async askAI(params: { message: string }) {
-    const { message } = params;
+  async askAI(params: { message: string; selectedRecordingId: string | null }) {
+    const { message, selectedRecordingId } = params;
 
     const response = await createAxiosClient("application/json", "json").post(
       `/ai-model/ask-ai`,
-      { message }
+      { message, selectedRecordingId }
     );
 
     if (response.status !== 200) {

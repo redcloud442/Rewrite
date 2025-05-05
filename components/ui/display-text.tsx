@@ -3,12 +3,24 @@
 import { useIsDoneTypingStore } from "@/store/isDoneTypingStore";
 import { useEffect, useState } from "react";
 
-export const useTypingEffect = (text: string, speed = 20) => {
+export const useTypingEffect = (
+  text: string,
+  speed = 20,
+  selectedRecordingId: string | null
+) => {
   const { setIsDoneTyping } = useIsDoneTypingStore();
   const [displayedText, setDisplayedText] = useState("");
 
   useEffect(() => {
+    setIsDoneTyping(false);
     let index = 0;
+
+    // ✅ If a recording is selected, show full text immediately
+    if (selectedRecordingId) {
+      setDisplayedText(text);
+      setIsDoneTyping(true);
+      return;
+    }
 
     const interval = setInterval(() => {
       index++;
@@ -20,7 +32,7 @@ export const useTypingEffect = (text: string, speed = 20) => {
     }, speed);
 
     return () => clearInterval(interval);
-  }, [text, speed]);
+  }, [text, speed, selectedRecordingId]);
 
   return displayedText;
 };

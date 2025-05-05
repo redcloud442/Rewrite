@@ -1,15 +1,13 @@
 "use client";
 
 import {
-  AudioWaveform,
   Blocks,
   Calendar,
-  Command,
   Home,
   Inbox,
   MessageCircleQuestion,
+  Mic,
   Settings2,
-  Sparkles,
   Trash2,
 } from "lucide-react";
 import * as React from "react";
@@ -20,47 +18,31 @@ import { NavSecondary } from "@/components/Layout/nav-secondary";
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
-
 // This is sample data.
 const data = {
-  teams: [
-    {
-      name: "Acme Inc",
-      logo: Command,
-      plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
-    },
-  ],
   navMain: [
-    {
-      title: "Ask AI",
-      url: "/ask-ai",
-      icon: Sparkles,
-    },
+    // {
+    //   title: "Ask AI",
+    //   url: "/app/ask-ai",
+    //   icon: Sparkles,
+    // },
     {
       title: "Home",
       url: "/app",
       icon: Home,
-      isActive: true,
     },
     {
-      title: "Inbox",
-      url: "#",
+      title: "Editor",
+      url: "/app/editor",
       icon: Inbox,
-      badge: "10",
+    },
+    {
+      title: "Record",
+      url: "/app/record",
+      icon: Mic,
     },
   ],
   navSecondary: [
@@ -90,53 +72,23 @@ const data = {
       icon: MessageCircleQuestion,
     },
   ],
-  favorites: [
-    {
-      name: "Project Management & Task Tracking",
-      url: "#",
-      emoji: "📊",
-    },
-    {
-      name: "Family Recipe Collection & Meal Planning",
-      url: "#",
-      emoji: "🍳",
-    },
-
-    {
-      name: "Home Renovation Ideas & Budget Tracker",
-      url: "#",
-      emoji: "🏠",
-    },
-    {
-      name: "Personal Finance & Investment Portfolio",
-      url: "#",
-      emoji: "💰",
-    },
-    {
-      name: "Movie & TV Show Watchlist with Reviews",
-      url: "#",
-      emoji: "🎬",
-    },
-    {
-      name: "Daily Habit Tracker & Goal Setting",
-      url: "#",
-      emoji: "✅",
-    },
-  ],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar className="border-r-0" {...props}>
       <SidebarHeader>
+        <h1 className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-400 font-black text-2xl">
+          Rewrite
+          <span className="text-gray-700 font-bold">AI</span>
+        </h1>
         <NavMain items={data.navMain} />
       </SidebarHeader>
       <SidebarContent>
-        <NavFavorites favorites={data.favorites} />
+        <NavFavorites />
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarRail />
-      <SidebarFooter></SidebarFooter>
     </Sidebar>
   );
 }
