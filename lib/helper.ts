@@ -1,3 +1,4 @@
+import { FormResponse, responseData } from "@/types/types";
 import { ZodSchema } from "zod";
 
 export const validateFields = <T>(params: {
@@ -38,4 +39,45 @@ export const base64ToBlob = (base64: string, mimeType: string) => {
     .map((_, i) => byteCharacters.charCodeAt(i));
   const byteArray = new Uint8Array(byteNumbers);
   return new Blob([byteArray], { type: mimeType });
+};
+
+export const submitDynamicForm = (params: {
+  formData: FormResponse;
+  userId: string | null;
+}) => {
+  const { formData, userId } = params;
+
+  const result: {
+    fields: {
+      field_id: string;
+      response_user_id: string;
+      response_value: string;
+    }[];
+  }[] = [];
+
+  formData.sections.forEach((section) => {
+    const fields = section.fields.map((field) => {
+      if (field.field_required && !field.field_response) {
+        throw new Error(
+          `Missing required field response for "${field.field_label}" in section "${section.section_name}"`
+        );
+      }
+
+      return {
+        field_id: field.field_id,
+        response_user_id: userId,
+        response_value: field.field_response ?? null,
+      };
+    });
+    result.push({
+      fields: fields.map((field) => ({
+        ...field,
+        response_user_id: field.response_user_id ?? "",
+      })),
+    });
+  });
+
+  const resultFlat = result.flatMap((item) => item.fields);
+
+  return resultFlat as responseData[];
 };

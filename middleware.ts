@@ -27,13 +27,13 @@ export default clerkMiddleware(async (auth, req) => {
     return response;
   }
 
-  //   if (userId && isOnboardingRoute(req)) {
-  //     return NextResponse.next();
-  //   }
+  if (userId && isOnboardingRoute(req)) {
+    return NextResponse.next();
+  }
 
   if (
     userId &&
-    // sessionClaims?.metadata?.onboardingComplete &&
+    sessionClaims?.metadata?.onboardingComplete &&
     isProtectedRoute(req)
   ) {
     return NextResponse.next();
@@ -42,10 +42,10 @@ export default clerkMiddleware(async (auth, req) => {
   if (!userId && !isPublicRoute(req))
     return redirectToSignIn({ returnBackUrl: req.url });
 
-  //   if (userId && !sessionClaims?.metadata?.onboardingComplete) {
-  //     const onboardingUrl = new URL("/onboarding", req.url);
-  //     return NextResponse.redirect(onboardingUrl);
-  //   }
+  if (userId && !sessionClaims?.metadata?.onboardingComplete) {
+    const onboardingUrl = new URL("/onboarding", req.url);
+    return NextResponse.redirect(onboardingUrl);
+  }
 
   if (userId && !isPublicRoute(req)) return NextResponse.next();
 });

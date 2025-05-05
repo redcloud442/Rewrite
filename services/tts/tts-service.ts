@@ -1,10 +1,7 @@
 import { createAxiosClient } from "@/providers/axiosClient";
 
 export const ttsService = {
-  async postTTS(
-    params: { file: File; voice: string; language: string },
-    token?: string
-  ) {
+  async postTTS(params: { file: File; voice: string; language: string }) {
     const { file, voice, language } = params;
     const formData = new FormData();
     formData.append("file", file);
@@ -14,7 +11,6 @@ export const ttsService = {
 
     const response = await createAxiosClient(
       "multipart/form-data",
-      token,
       "json"
     ).post(`/tts/file`, formData);
 

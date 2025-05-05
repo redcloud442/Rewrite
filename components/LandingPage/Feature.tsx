@@ -135,11 +135,29 @@ const CardWithIcons = ({
   </div>
 );
 
-const CardWithCode = ({ title, code }: { title: string; code: string }) => (
+const CardWithCode = ({
+  title,
+  code,
+  badges,
+  description,
+}: {
+  title: string;
+  code: string;
+  badges: string[];
+  description: string;
+}) => (
   <div className="rounded-xl border bg-muted/20 p-6 text-left shadow-sm space-y-4 hover:shadow-md transition">
     <h3 className="text-lg font-semibold">{title}</h3>
+    <p className="text-muted-foreground text-sm">{description}</p>
     <pre className="bg-background border rounded-lg p-4 text-sm overflow-auto">
       {code}
     </pre>
+    <div className="flex gap-2">
+      {badges.map((badge, idx) => (
+        <div key={idx} className="rounded-md bg-muted/30 px-2 py-1 text-xs">
+          {badge}
+        </div>
+      ))}
+    </div>
   </div>
 );

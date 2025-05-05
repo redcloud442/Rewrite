@@ -4,7 +4,6 @@ import { ttsService } from "@/services/tts/tts-service";
 import { useFileStore } from "@/store/fileStore";
 import { useIsLoadingStore } from "@/store/isLoadingStore";
 import { useMessageStore } from "@/store/messageStore";
-import { useAuth } from "@clerk/nextjs";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -27,7 +26,6 @@ const FileUploaderSection = ({ onHasProcessed }: Props) => {
   const { setFiles } = useFileStore();
   const { setMessages } = useMessageStore();
   const { setIsLoading } = useIsLoadingStore();
-  const { getToken } = useAuth();
   const form = useForm<FileUploadSchema>({
     resolver: zodResolver(fileUploadSchema),
     defaultValues: {
@@ -41,8 +39,6 @@ const FileUploaderSection = ({ onHasProcessed }: Props) => {
 
     if (!file) return;
 
-    const token = await getToken();
-
     setMessages({
       message: "Creating a summary of the document...",
       ai: false,
@@ -50,10 +46,7 @@ const FileUploaderSection = ({ onHasProcessed }: Props) => {
 
     try {
       setIsLoading(true);
-      const response = await ttsService.postTTS(
-        { file, voice, language },
-        token ?? undefined
-      );
+      const response = await ttsService.postTTS({ file, voice, language });
 
       const audioBlob = base64ToBlob(response.audio, "audio/mpeg");
       const audioUrl = URL.createObjectURL(audioBlob);

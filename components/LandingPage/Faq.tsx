@@ -29,7 +29,8 @@ const Faq = () => {
           <AccordionItem value="item-3">
             <AccordionTrigger>Can I try before paying?</AccordionTrigger>
             <AccordionContent>
-              Yes! Start with the Free plan and upgrade whenever you're ready.
+              Yes! Start with the Free plan and upgrade whenever you&apos;re
+              ready.
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="item-4">

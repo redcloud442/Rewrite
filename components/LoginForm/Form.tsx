@@ -52,22 +52,22 @@ const FormContent = () => {
     }
   };
 
-  const handleGoogleLogin = async () => {
-    try {
-      const result = await signIn?.authenticateWithRedirect({
-        strategy: "oauth_google",
-        redirectUrl: "/onboarding",
-        redirectUrlComplete: "/dashboard",
-      });
+  //   const handleGoogleLogin = async () => {
+  //     try {
+  //       const result = await signIn?.authenticateWithRedirect({
+  //         strategy: "oauth_google",
+  //         redirectUrl: "/onboarding",
+  //         redirectUrlComplete: "/dashboard",
+  //       });
 
-      console.log(result);
-    } catch (err: unknown) {
-      console.log(err);
-      toast.error(
-        getClerkErrorMessage({ err, defaultMessage: "Login failed." })
-      );
-    }
-  };
+  //       console.log(result);
+  //     } catch (err: unknown) {
+  //       console.log(err);
+  //       toast.error(
+  //         getClerkErrorMessage({ err, defaultMessage: "Login failed." })
+  //       );
+  //     }
+  //   };
 
   return (
     <div className="flex flex-col gap-6">
