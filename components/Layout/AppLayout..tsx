@@ -2,7 +2,6 @@
 
 import {
   Blocks,
-  Calendar,
   Home,
   Inbox,
   MessageCircleQuestion,
@@ -40,17 +39,12 @@ const data = {
       icon: Inbox,
     },
     {
-      title: "Record",
-      url: "/app/record",
+      title: "Recordings",
+      url: "/app/recordings",
       icon: Mic,
     },
   ],
   navSecondary: [
-    {
-      title: "Calendar",
-      url: "#",
-      icon: Calendar,
-    },
     {
       title: "Settings",
       url: "#",

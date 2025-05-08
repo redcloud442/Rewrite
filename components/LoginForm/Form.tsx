@@ -41,7 +41,7 @@ const FormContent = () => {
       if (result?.status === "complete") {
         await setActive?.({ session: result.createdSessionId });
         toast.success("Logged in successfully");
-        router.push("/dashboard"); // or wherever your app routes after login
+        router.push("/app"); // or wherever your app routes after login
       } else {
         toast.error("Login incomplete. Please try again.");
       }

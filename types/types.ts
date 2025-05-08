@@ -75,3 +75,12 @@ export type File = {
   audioName: string;
   audioUrl: string | null;
 };
+
+export enum RuleType {
+  Api,
+  NoUserMustSignIn,
+  MustFinishOnboarding,
+  ProtectedRoute,
+  PublicToPrivateRedirect,
+  DefaultAllow,
+}

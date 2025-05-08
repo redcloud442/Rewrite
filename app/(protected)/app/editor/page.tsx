@@ -1,5 +1,7 @@
+import Tiptap from "@/components/TipTap/Editor";
+
 const page = () => {
-  return <div>page</div>;
+  return <Tiptap />;
 };
 
 export default page;
